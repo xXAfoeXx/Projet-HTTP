@@ -1,0 +1,3 @@
+Bonjour je suis un etudiant
+J'essaye une fonction
+Pour lire un fichier
