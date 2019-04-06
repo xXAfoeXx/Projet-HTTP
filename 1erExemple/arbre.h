@@ -25,6 +25,7 @@ noeud* frere(noeud* frere);
 
 void affArbre(noeud* rac);
 void affParSize(char* str, int size);
+char* strParSize(char* str, int size);
 void affNoeud(noeud* cell);
 
 void viderArbre(noeud* racine);

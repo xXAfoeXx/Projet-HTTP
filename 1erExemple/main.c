@@ -3,6 +3,7 @@
 #include "arbre.h"
 #include "gestFichier.h"
 #include "foncParseur.h"
+#include "foncAnnexe.h"
 
 
 int main(int argc, char const *argv[]) {

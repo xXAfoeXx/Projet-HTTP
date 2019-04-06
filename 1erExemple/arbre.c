@@ -92,14 +92,26 @@ void affArbre(noeud* rac){
 
 void affParSize(char* str, int size){
 
-  for(int i = 0; i < size; i++){
-    printf("%c", str[i]);
-  }
+  char* str2 = strParSize(str, size);
+  printf("%s", str2);
+
+  free(str2);
 
 }
 
+char* strParSize(char* str, int size){
+
+  char* str2 = malloc((size+1)*sizeof(char));
+  for(int i = 0; i < size; i++){
+    str2[i] = str[i];
+  }
+  str2[size] = '\0';
+
+  return str2;
+}
+
 void affNoeud(noeud* cell){
-  printf("%% %s %%: ", cell->field);
+  printf("**%s**:", cell->field);
   affParSize(cell->value, cell->size);
   printf("\n");
 }
