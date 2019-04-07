@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "arbre.h"
+#include <string.h>
 
 
 
@@ -111,11 +112,10 @@ char* strParSize(char* str, int size){
 }
 
 void affNoeud(noeud* cell){
-  printf("**%s**:", cell->field);
+  printf("%s:", cell->field);
   affParSize(cell->value, cell->size);
   printf("\n");
 }
-
 
 void viderArbre(noeud* racine){
   // Fonction pour vider un arbre
@@ -130,4 +130,91 @@ void viderArbre(noeud* racine){
   }
   //Un fois le fils et le frere vide, on libere le noeud
   free(racine);
+}
+
+
+_Token* chercherArbre(noeud* rac, char* nom){
+  noeud* courant = rac;
+  _Token* tok = NULL;
+  _Token* tokTmp = NULL;
+  _Token* last = NULL;
+
+  //On regarde tous les freres
+  while (courant != NULL) {
+    //Construction a l'envers
+    if(!strcmp(courant->field, nom)){
+      tok = ajoutTok(courant);
+      if (last == NULL) last = tok;
+      tok->next = tokTmp;
+      tokTmp = tok;
+    }
+    courant = courant->frere;
+  }
+
+  //Puis on regarde le fils et les freres de ces fils
+
+  courant = rac;
+  // Pour chaque frere
+
+  while (courant != NULL) {
+    // On regarde le fils (si y en a un)
+    if(courant->fils != NULL){
+      //On ajoute a la fin de la liste
+      if(last != NULL) last->next = chercherArbre(courant->fils, nom);
+      else if(tok == NULL) tok = chercherArbre(courant->fils, nom);
+      //Et on met a jour last
+      while(last != NULL && last->next != NULL){
+        last = last->next;
+      }
+    }
+    courant = courant->frere; // On passe au frere suivant
+  }
+
+  return tok;
+}
+
+_Token* ajoutTok(noeud* n){
+  _Token* tok = malloc(sizeof(_Token));
+  tok->node = n;
+  tok->next = NULL;
+
+  return tok;
+
+}
+
+void afficherTok(_Token* tok){
+  int i = 0;
+
+  _Token* courant = tok;
+  printf("---Recherche---\n");
+  //Affichage a l'envers
+  while(courant != NULL){
+    //affNoeud(courant->node);
+    courant = courant->next;
+    i++;
+  }
+
+  courant = tok;
+  affRec(courant);
+
+  printf("%d resultat(s)\n", i);
+}
+
+void affRec(_Token* tok){
+  if(tok != NULL){
+    affRec(tok->next);
+    affNoeud(tok->node);
+  }
+}
+
+void viderRecherche(_Token* tok){
+
+  if(tok == NULL){
+
+  }
+  else{
+    viderRecherche(tok->next);
+    free(tok);
+  }
+
 }

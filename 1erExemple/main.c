@@ -4,21 +4,39 @@
 #include "gestFichier.h"
 #include "foncParseur.h"
 #include "foncAnnexe.h"
+#include "api.h"
 
 
 int main(int argc, char const *argv[]) {
 
-  char nomFichier[] = "get1.";
+  char nomFichier[] = "get2.";
   char* msg = chargerFichier(nomFichier);
   int taille = tailleFichier(nomFichier);
 
   printf("taille du fichier = %d\n", taille);
   printf("--------------Arbre------------\n");
-  noeud* rac = parse(msg, taille);
+  //noeud* rac = parse(msg, taille);
 
-  affArbre(rac);
+  if(parseur(msg, taille)){
 
-  viderArbre(rac);
+    noeud* rac = getRootTree();
+    _Token* tok = NULL;
+
+    tok = chercherArbre(rac, "media-range");
+
+    afficherTok(tok);
+
+    int len;
+
+    printf("\n%s : ", getElementTag((tok->node), &len));
+    affParSize(getElementValue((tok->node), &len), len);
+
+    viderRecherche(tok);
+
+    purgeTree(rac);
+  }
+
+
   free(msg);
 
 
