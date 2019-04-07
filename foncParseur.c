@@ -5,9 +5,9 @@
 #include "arbre.h"
 #include "foncAnnexe.h"
 
-char* chaine_parse[] = {"connection" , "user-agent" , "accept" , "accept-language" , "accept-encoding" , "content-length" , "content-type" , "cookie" , "transfer-encoding" , "expect" , "host" , "accept-charset" , "accept-encoding" ,"referer"};
+char* chaine_parse[15] = {"connection " , "user-agent" , "accept" , "accept-language" , "accept-encoding" , "content-length " , "content-type" , "cookie" , "transfer-encoding" , "expect" , "host" , "accept-charset" , "accept-encoding" ,"referer"};
 
-int (*fonction_parse[]) (noeud*) = {connection_parse , user_agent_parse , accept_parse , accept_language_parse , accept_encoding_parse , content_length_parse , content_type_parse , cookie_parse , transfer_encoding_parse , expect_parse , host_parse , accept_charset_parse ,referer_parse};
+int (*fonction_parse[15]) (noeud*) = {connection_parse , user_agent_parse , accept_parse , accept_language_parse , accept_encoding_parse , content_length_parse , content_type_parse , cookie_parse , transfer_encoding_parse , expect_parse , host_parse , accept_charset_parse ,referer_parse};
 
 int OWS_plus(char* p, int* i){ // comme ows mais avec la virgule
   int tmp = *i;
@@ -19,7 +19,7 @@ int OWS_plus(char* p, int* i){ // comme ows mais avec la virgule
 }
 
 int est_digit(char* chaine){	//return 1 si le permier caractere est un digit, 0 sinon
-	if( (*chaine) > (int)'0' && (*chaine) < (int)'9' ) return 1;
+	if( ((*chaine) > (int)'0') && ((*chaine) < (int)'9') ) return 1;
 	else return 0;
 }
 
@@ -157,7 +157,7 @@ noeud* header_field_parse(noeud* pere){
 				break;
 			}
 			else if( est_valide == -1){
-				printf("erreur  champs %s non valide %s \n",hn,fils->field);
+				printf("erreur  champs %s non valide\n",hn);
 				break;
 			}	  
 		  }
@@ -178,40 +178,31 @@ noeud* header_field_parse(noeud* pere){
 int connection_parse(noeud* pere){
 	char* a_parser;
 	int start = 0;
-	int debut = 9;
-	int erreur = 0;
-	int taille;
-	crFils(pere,pere->value,"case_insesitive_string",debut); // on creer la noeud content-length
-	a_parser = pere->field + debut;
-	if(*a_parser == ' '){
-		a_parser++;
-		debut++;
-		if(*a_parser == ':'){
-			a_parser++;
-			debut++;
-			OWS(a_parser,&start);
+	int debut = 0;
+	int taille =0;
+	a_parser = pere->value;
+	OWS(a_parser,&start);
+	a_parser += start;
+	debut +=start;
+	while(*a_parser != '\r' && *(a_parser+1) != '\n' && *(a_parser+2) != ' '){
+		start = 0;
+		taille =0;
+		while(OWS_plus(a_parser,&start)){
 			a_parser += start;
-			debut ++;
-			while(a_parser != NULL){
-				start = 0;
-				taille =0;
-				while(OWS_plus(a_parser,&start)){
-					a_parser += start;
-					debut += start;
-					start =0;
-				}
-				while(!OWS(a_parser,&start)){
-					taille++;
-					a_parser++;
-				}
-				if(taille != 0){
-					crFils(pere,(pere->value)+debut,"connection",taille); // si la ligne est correct alors on creer le noeud
-				}
-				taille =0;								
-			}
-		}else erreur = -1;
-	}else erreur = -1;
-	return erreur;
+			debut += start;
+			start =0;
+		}
+		while(!OWS(a_parser,&start) && *a_parser != ',' ){
+			taille++;
+			a_parser++;
+		}
+		if(taille != 0){
+			crFils(pere,(pere->value)+debut,"connection",taille); // si la ligne est correct alors on creer le noeud
+		}
+		debut += taille;
+		taille =0;
+	}
+	return 0;
 }
 
 
@@ -219,30 +210,25 @@ int connection_parse(noeud* pere){
 int content_length_parse(noeud* pere){
 	char* a_parser;
 	int start = 0;
-	int erreur = 0;
 	int taille = 0;
-	crFils(pere,pere->value,"case_insesitive_string",14); // on creer la noeud content-length
-	a_parser = pere->field + 14;
-	if(*a_parser == ' '){
-		a_parser++;
-		if(*a_parser == ':'){
-			a_parser++;
-			OWS(a_parser,&start);
-			a_parser += start;
-			while(a_parser != NULL){
-				if( est_digit(a_parser) == 0){	// on verifie qu'il y a uniquement des digits
-					erreur = -1;
-				}
-				taille ++;
-				a_parser ++;
-			}
-		}else erreur = -1;
-	}else erreur = -1;
-	if(erreur == 0){
-		crFils(pere,(pere->value)+14+start+2,"content-length",taille); // si la ligne est correct alors on creer le noeud
-		return erreur;
+	int taille_tot = 0;
+	a_parser = pere->value;
+	OWS(a_parser,&start);
+	a_parser += start;
+	taille_tot += start;
+	while(est_digit(a_parser)){
+		taille ++;
+		a_parser ++;
 	}
-	return erreur;
+	start =0;
+	OWS(a_parser,&start);
+	a_parser += start;
+	taille_tot += start + taille;
+	if(taille_tot == ( pere->size-1 ) ){
+		crFils(pere,(pere->value)+14+start+2,"content-length",taille); // si la ligne est correct alors on creer le noeud
+		return 0;
+	}
+	return -1;
 }
 
 int content_type_parse(noeud* pere){
