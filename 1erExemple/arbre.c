@@ -20,6 +20,7 @@ noeud* crCellule(char* value, char* field, int size){
   return cell;
 }
 
+
 noeud* crRacine(char* value, char* field, int size){
   return crCellule(value, field, size);
 }

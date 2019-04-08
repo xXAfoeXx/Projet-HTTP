@@ -246,7 +246,32 @@ int content_length_parse(noeud* pere){
 }
 
 int content_type_parse(noeud* pere){
-	return 0;
+	char* a_parser;
+	int start = 0;
+	int erreur = 0;
+	int taille = 0;
+	crFils(pere,pere->value,"case_insesitive_string",14); // on creer la noeud content-parse
+	a_parser = pere->field + 14;
+	if(*a_parser == ' '){
+		a_parser++;
+		if(*a_parser == ':'){
+			a_parser++;
+			OWS(a_parser,&start);
+			a_parser += start;
+			while(a_parser != NULL){
+				if( est_digit(a_parser) == 0){	// on verifie qu'il y a uniquement des digits
+					erreur = -1;
+				}
+				taille ++;
+				a_parser ++;
+			}
+		}else erreur = -1;
+	}else erreur = -1;
+	if(erreur == 0){
+		crFils(pere,(pere->value)+14+start+2,"content-type",taille); // si la ligne est correct alors on creer le noeud
+		return erreur;
+	}
+	return erreur;
 }
 
 int cookie_parse(noeud* pere){

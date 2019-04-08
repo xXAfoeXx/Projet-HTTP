@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "gestFichier.h"
 
+
 char* chargerFichier(char* nomFichier){
   int taille = tailleFichier(nomFichier);
   int i = 0;
