@@ -9,7 +9,7 @@
 
 int main(int argc, char const *argv[]) {
 
-  char nomFichier[] = "get2.";
+  char nomFichier[] = "get2.txt";
   char* msg = chargerFichier(nomFichier);
   int taille = tailleFichier(nomFichier);
 
