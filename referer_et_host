@@ -1,0 +1,212 @@
+
+int host_parse(noeud* pere){
+	// IP-LITERAL | IPv4adresse | reg-name
+	if(ip_literal(pere) || ipv4adress(pere) || reg_name(pere) ){
+		return 0;
+	}
+	return -1;
+}
+
+int ip_literal(noeud* pere){
+	int start;
+	char* a_parser = pere->value
+	if(*a_parser == '['){
+		if((start = ipv6adress(a_parser) )!=0 || (start = ipvfuture(a_parser)) !=0){
+			if(*(a_parser+start) == ']'){
+				OWS(a_parser+start,start);
+				a_parser += start;
+				if(*a_parser == '\n';){
+					crFils(pere,(pere->value)+1,"IP-literal",start-1);
+					return 1;
+				}
+			}
+		
+	}
+	return 0;
+}
+
+
+
+int ipvfuture(char* a_parser){
+	int test = 0;
+	int décalage =0;
+	if(*a_parser = 'v'){
+		decalage ++;
+		a_parser ++;
+		while( (décalage = est_hexa(a_parser)) != 0){
+			test+=1;
+			a_parser+=decalage;
+			taille += decalage;
+		}
+		if(a_parser == '.' && test != 0){
+			test = 0;
+			while ( est_unreserved(a_parser) || est_sub_delim(a_parser) || *a_parser == ':'){
+				taille ++;
+				a_parser ++;
+				test++;
+			}
+			if(test != 0){
+				return taille;
+			}
+		}
+		
+	}
+	return 0;
+}
+
+int ipv4adress(noeud* pere){
+	char* a_parser = pere->value;
+	int decalage=0;
+	int taille =0;
+	
+	if( decalage = est_dec_octet(a_parser) != 0){
+		a_parser += decalage;
+		taille = decalage;
+	}
+	else return 0;
+	
+	for(int i = 0; i<3;i++){
+		
+		if(*a_parser == '.') {
+			a_parser++;
+			taille ++;
+		}
+		else return 0;
+		
+		if( decalage = est_dec_octet(a_parser) != 0){
+			a_parser += decalage;
+			taille +=decalage;
+		}
+		else return 0;
+	}
+	decalage = 0;
+	OWS(a_parser,decalage);
+	a_parser += decalage;
+	if(*a_parser == '\n'){
+		crFils(pere,pere->value,"IPv4adresse",taille);
+		return 1;
+	}
+	else return 0;
+}
+
+int reg_name(pere){
+	char* a_parser = pere->value;
+	int decalage=0;
+	int taille =0;
+	while( decalage = est_unreserved(a_parser) || decalage = est_pct_encoded(a_parser) || decalge = est_sub_delim(a_parser) ){
+		a_parser += decalage;
+		taille += decalage;
+	}
+	decalage = 0;
+	OWS(a_parser,decalage);
+	a_parser += decalage;
+	if(*a_parser == '\n'){
+		crFils(pere,pere->value,"reg-name",taille);
+	}
+}
+
+int referer_parse(noeud* pere){
+	if( est_absolute_URI(pere) || est_partial_URI(pere) ){
+		return 1;
+	}
+	return 0;
+}
+
+int est_absolute_URI(noeud* pere){
+	char* a_parser = pere->value;
+	int taille = 0;
+	int decalage =0;
+	if(est_alpha(*a_parser)){
+		while( est_alpha(*a_parser) || est_digit(*a_parser) || *a_parser == '+' || *a_parser == '-' || *a_parser == '.'){
+			a_parser++;
+			taille ++;
+		}
+		if(*a_parser == ':'){
+			if(decalage = est_hier_part(a_parser)){
+				
+			}
+			else return 0;
+			if (*a_parser == '?'){
+				decalage = est_query(a_parser)
+				taille +=decalage;
+				a_parser += decalage;
+				else return 0;
+			}
+			if(*a_parser == '\n'){
+				crFils(pere,pere->value,"absolute-URI",taille);
+				return 0;
+			}
+		}
+	}
+	return -1;
+}
+
+int est_partial_URI(noeud* pere){
+	char* a_parser = pere->value;
+	int taille = 0;
+	int decalage =0;
+	if( decalage = est_relative_part(a_parser) != 0){
+		taille += decalage;
+		a_parser += decalage;
+		if (*a_parser == '?'){
+			decalage = est_query(a_parser)
+			taille +=decalage;
+			a_parser += decalage;
+		}
+		if(*a_parser == '\n'){
+			crFils(pere,pere->value,"absolute-URI",taille);
+		}
+	}
+	return -1;
+}
+
+int est_digit(char* chaine){	//return 1 si le permier caractere est un digit, 0 sinon
+	if( ((*chaine) > (int)'0') && ((*chaine) < (int)'9') ) return 1;
+	else return 0;
+}
+
+int est_query(char* a_parser){
+	int decalage = 0;
+	while( est_p_char(a_parser) || *a_parser == '/' ||*a_parser == '?'){
+		decalge++;
+		a_parser++;
+	}
+	return decalage;
+}
+
+int est_p_char(char* a_parser){
+	int decalge = 0;
+	if( decalge = est_unreserved(a_parser) || decalage = est_pct_encoded(a_parser) || decalage = est_sub_delim(a_parser) || *a_parser == ';' || *a_parser == '@'){
+		if(decalage = 0) decalage ++;
+		return decalage;
+	}
+	return 0;
+}
+
+int est_sub_delim(char* a_parser){
+	if(*a_parser == '!' || *a_parser == '$' || *a_parser == '&' || *a_parser == '\'' || *a_parser == '(' || *a_parser == ')' || *a_parser == '*' || *a_parser == '+' || *a_parser == ',' || *a_parser == ';' || *a_parser == '=' ) {
+		return 1;
+	}
+	return 0;
+}
+
+int est_alpha(char* a_parser){
+	if( (int)*a_parser < (int)'Z' && (int)*a_parser > (int)'a')
+	return 0;
+}
+
+int est_relative_part(char* a_parser){
+	return 0;
+}
+int est_hier_part(char* a_parser){
+	return 0;
+}
+int est_unreserved(char* a_parser){
+	return 0;
+}
+int ipv6adress(char* a_parser){
+	return 0;
+}
+int est_dec_octet(char* a_parser){
+	return 0;
+}
